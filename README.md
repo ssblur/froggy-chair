@@ -1,4 +1,5 @@
-# Tiny Life Example Mod
-An example mod for my game Tiny Life. Use this template repository to create your own mod!
+# Froggy Set
 
-The Tiny Life modding and custom content documentation has found a permanent home at [docs.tinylifegame.com](https://docs.tinylifegame.com).
+(: 
+
+![froggy chair <3](docs/Froggy_Chair.webp)
