@@ -12,6 +12,7 @@ using TinyLife.Emotions;
 using TinyLife.Mods;
 using TinyLife.Objects;
 using TinyLife.Utilities;
+using MLEM.Misc;
 using TinyLife.World;
 
 namespace FroggySetMod {
@@ -48,6 +49,7 @@ namespace FroggySetMod {
                 Icon = Icon,
                 ObjectSpots = ObjectSpot.TableSpots(new Point(1, 1)).ToArray()
             });
+
             FurnitureType.Register(new FurnitureType.TypeSettings(
                 $"{info.Id}.FroggyChair", 
                 new Point(1, 1), 
@@ -60,7 +62,11 @@ namespace FroggySetMod {
                 ConstructedType = typeof(FroggyChair),
                 Icon = Icon,
                 ObjectSpots = {},
-                ActionSpots = {}
+                ActionSpots = new[] {new ActionSpot(Vector2.Zero, -2 / 16F, Direction2Helper.Adjacent) {
+                    DrawLayer = f => 2
+                    }
+                },
+                ColorMap = new int[] {0, 1, 2, 0}
             });
         }
 
