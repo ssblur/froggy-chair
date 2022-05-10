@@ -76,6 +76,8 @@ namespace FroggySetMod {
 
             texturePacker.Add(content.Load<Texture2D>("UiTextures"), r => UI = new UniformTextureAtlas(r, 1, 1));
             texturePacker.Add(content.Load<Texture2D>("FroggySetLUT"), r => LUT = new UniformTextureAtlas(r, 1, 8));
+
+            SitToot.Init(content);
         }
 
         public override IEnumerable<string> GetCustomFurnitureTextures(ModInfo info) {
