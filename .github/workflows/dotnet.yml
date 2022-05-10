@@ -1,0 +1,32 @@
+name: .NET
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: bash Publish.sh
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Release
+        path: bin/Debug/*.zip
+    - name: "Release"
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+        files: bin/Debug/*.zip
+      
