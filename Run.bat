@@ -10,5 +10,5 @@ rem run the game
 set /p dir=<"%LOCALAPPDATA%/Tiny Life/GameDir"
 cd /d %dir%
 "Tiny Life.exe" -v --skip-splash --skip-preloads
-del "%LOCALAPPDATA%/Tiny Life/Mods"
+RMDIR /S /Q "%LOCALAPPDATA%/Tiny Life/Mods"
 move "%LOCALAPPDATA%/Tiny Life/ModsBackup" "%LOCALAPPDATA%/Tiny Life/Mods"
