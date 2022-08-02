@@ -21,7 +21,8 @@ namespace FroggySetMod {
         }
 
         [HarmonyPatch(typeof(TypelessAction), nameof(TypelessAction.Sit))] 
-        static void Prefix(Person person, Furniture chair, float speedMultiplier, ActionSpot spot = null) {
+        static void Prefix(TypelessAction __instance, Furniture chair, float speedMultiplier, ActionSpot spot = null) {
+            Person person = __instance.Person;
             if(
                 chair is FroggyChair &&
                 !Sitting.GetValueOrDefault(person, false)

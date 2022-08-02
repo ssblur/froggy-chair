@@ -1,38 +1,38 @@
 FroggySetMod.LilyPadTableUp
 loc 0 0 32 32
-piv -16 -24
+piv 16 24
 
 FroggySetMod.LilyPadTableRight
 loc 0 0 32 32
-piv -16 -24
+piv 16 24
 off 128 32
 
 FroggySetMod.LilyPadTableDown
 loc 0 0 32 32
-piv -16 -24
+piv 16 24
 off 128 0
 
 FroggySetMod.LilyPadTableLeft
 loc 0 0 32 32
-piv -16 -24
+piv 16 24
 off 0 32
 
 FroggySetMod.FroggyChairRight
 loc 0 0 32 32
-piv -16 -24
+piv 16 24
 off 0 64
 
 FroggySetMod.FroggyChairDown
 loc 0 0 32 32
-piv -16 -24
+piv 16 24
 off 128 64
 
 FroggySetMod.FroggyChairLeft
 loc 0 0 32 32
-piv -16 -24
+piv 16 24
 off 0 96
 
 FroggySetMod.FroggyChairUp
 loc 0 0 32 32
-piv -16 -24
+piv 16 24
 off 128 96
