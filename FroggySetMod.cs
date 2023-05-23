@@ -66,7 +66,8 @@ namespace FroggySetMod {
                     DrawLayer = f => 2
                     }
                 },
-                ColorMap = new int[] {0, 1, 2, 0}
+                ColorMap = new int[] {0, 1, 2, 0},
+                DefaultRotation = Direction2.Down
             });
         }
 
@@ -74,10 +75,14 @@ namespace FroggySetMod {
             Logger = logger;
             Info = info;
 
-            texturePacker.Add(content.Load<Texture2D>("UiTextures"), r => UI = new UniformTextureAtlas(r, 1, 1));
-            texturePacker.Add(content.Load<Texture2D>("FroggySetLUT"), r => LUT = new UniformTextureAtlas(r, 1, 8));
-
-            SitToot.Init(content);
+            texturePacker.Add(
+                content.Load<Texture2D>("UiTextures"), 
+                r => UI = new UniformTextureAtlas(r, 1, 1)
+            );
+            texturePacker.Add(
+                content.Load<Texture2D>("FroggySetLUT"), 
+                r => LUT = new UniformTextureAtlas(r, 1, 16)
+            );
         }
 
         public override IEnumerable<string> GetCustomFurnitureTextures(ModInfo info) {
