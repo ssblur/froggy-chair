@@ -7,13 +7,10 @@ using MLEM.Data;
 using MLEM.Data.Content;
 using MLEM.Textures;
 using TinyLife;
-using TinyLife.Actions;
-using TinyLife.Emotions;
 using TinyLife.Mods;
 using TinyLife.Objects;
 using TinyLife.Utilities;
 using MLEM.Misc;
-using TinyLife.World;
 
 namespace FroggySetMod {
 
