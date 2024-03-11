@@ -20,7 +20,7 @@ namespace FroggySetMod {
 
         public override string Name => "Froggy Set";
         public override string Description => "Not just Froggy Chair but Lily-Pad Table too (:";
-        public override string TestedVersionRange => "[0.38.0,0.39.1]";
+        public override string TestedVersionRange => "[0.40.0,0.40.1]";
 
         public override TextureRegion Icon => UI[0, 0];
 
@@ -55,7 +55,8 @@ namespace FroggySetMod {
                 75, 
                 FroggyBackColors,
                 FroggyPadColors,
-                ColorScheme.White
+                ColorScheme.White,
+                FroggyBackColors
             ) {
                 ConstructedType = typeof(FroggyChair),
                 Icon = Icon,
@@ -64,7 +65,6 @@ namespace FroggySetMod {
                     DrawLayer = f => 2
                     }
                 },
-                ColorMap = new int[] {0, 1, 2, 0},
                 DefaultRotation = Direction2.Down
             });
         }
