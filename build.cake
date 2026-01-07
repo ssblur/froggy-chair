@@ -1,74 +1,85 @@
+#addin nuget:?package=Cake.Incubator&version=8.0.0
+
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
 var target = Argument("target", "Run");
 var config = Argument("configuration", "Release");
+var userArgs = Argument("args", "");
+var projectFile = Argument("project", GetFiles("**/*.csproj").FirstOrDefault());
 
+var project = ParseProject(projectFile, config);
+var outputPath = project.OutputPaths.FirstOrDefault();
+var zipOutputPath = $"{outputPath.GetParent()}/{project.AssemblyName}.zip";
 var tinyLifeDir = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Tiny Life";
 
-Task("Build").DoesForEach(GetFiles("**/*.csproj"), p => {
-    DeleteFiles($"bin/{config}/**/*");
-    DotNetBuild(p.FullPath, new DotNetBuildSettings { Configuration = config });
+Task("Clean").Does(() => {
+    EnsureDirectoryDoesNotExist($"bin/{config}");
+    EnsureDirectoryDoesNotExist($"{tinyLifeDir}/Mods/_Dev");
 });
 
-Task("CopyToMods").IsDependentOn("Build").Does(() => {
-    var dir = $"{tinyLifeDir}/Mods";
-    var dotNetRoot = GetDirectories($"bin/{config}/net*").Last();
-    
-    CreateDirectory(dir);
-    var files = GetFiles($"{dotNetRoot}/**/*");
-    
-    // CopyFiles(files, dir, true);
-    Zip($"{dotNetRoot}", $"{dir}/FroggySet.zip", files);
+Task("Build").Does(() => {
+    DotNetBuild(projectFile.FullPath, new DotNetBuildSettings {
+        Configuration = config
+    });
+});
+
+Task("Zip").IsDependentOn("Build").Does(() => {
+    Zip(outputPath, zipOutputPath, GetFiles($"{outputPath}/**/*"));
+    Information($"Created zip archive {zipOutputPath}");
+});
+
+Task("CopyToMods").IsDependentOn("Zip").Does(() => {
+    var dir = $"{tinyLifeDir}/Mods/_Dev";
+    EnsureDirectoryExists(dir);
+    CopyFileToDirectory(zipOutputPath, dir);
 });
 
 Task("Run").IsDependentOn("CopyToMods").Does(() => {
-    // start the tiny life process
-    var exeDir = $"{tinyLifeDir}/GameDir";
-    if (!FileExists(exeDir))
-        throw new Exception("Didn't find game directory information. Run the game manually at least once to allow the Run task to be executed.");
-    var exe = $"{System.IO.File.ReadAllText(exeDir)}/Tiny Life";
-    var process = Process.Start(new ProcessStartInfo(exe) {
-        Arguments = "-v --skip-splash --skip-preloads",
-        CreateNoWindow = true
-    });
-
-    // we wait a bit to make sure the process has generated a new log file, bleh
-    Thread.Sleep(3000);
-
-    // attach to the newest log file
     var logsDir = $"{tinyLifeDir}/Logs";
-    var log = System.IO.Directory.EnumerateFiles(logsDir).OrderByDescending(System.IO.File.GetCreationTime).FirstOrDefault();
+    var lastLogs = System.IO.Directory.EnumerateFiles(logsDir).ToHashSet();
+
+    // start the tiny life process
+    var exeDir = System.IO.File.ReadAllText($"{tinyLifeDir}/GameDir");
+    var process = Process.Start(new ProcessStartInfo($"{exeDir}/TinyLife") {
+        Arguments = $"-v --trace-load --skip-splash --skip-preloads --debug-saves --ansi {userArgs}",
+        RedirectStandardOutput = true,
+        RedirectStandardError = true
+    });
+    // make sure the output buffers (which we ignore) don't fill up
+    process.BeginOutputReadLine();
+    process.BeginErrorReadLine();
+
+    // wait for a new log file to be generated
+    string log;
+    do {
+        log = System.IO.Directory.EnumerateFiles(logsDir).FirstOrDefault(l => !lastLogs.Contains(l));
+        if (log != null)
+            break;
+        Thread.Sleep(100);
+    } while (!process.HasExited);
+
+    // attach to the log file
     if (log != null) {
         using (var stream = new FileStream(log, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
             using (var reader = new StreamReader(stream)) {
                 var lastPos = 0L;
-                while (!process.HasExited) {
-                    if (reader.BaseStream.Length > lastPos) {
-                        reader.BaseStream.Seek(lastPos, SeekOrigin.Begin);
+                do {
+                    if (stream.Length > lastPos) {
+                        stream.Seek(lastPos, SeekOrigin.Begin);
                         string line;
                         while ((line = reader.ReadLine()) != null)
                             Information(line);
-                        lastPos = reader.BaseStream.Position;
+                        lastPos = stream.Position;
                     }
                     Thread.Sleep(10);
-                }
+                } while (!process.HasExited);
             }
         }
     }
 
     Information($"Tiny Life exited with exit code {process.ExitCode}");
-});
-
-Task("Publish").IsDependentOn("Build").DoesForEach(() => GetDirectories($"bin/{config}/net*"), d => {
-    var dllFile = GetFiles($"{d}/**/*.dll").FirstOrDefault();
-    if (dllFile == null)
-        throw new Exception($"Couldn't find built mod in {d}");
-    var dllName = System.IO.Path.GetFileNameWithoutExtension(dllFile.ToString());
-    var zipLoc = $"{d.GetParent()}/{dllName}.zip";
-    Zip(d, zipLoc, GetFiles($"{d}/**/*"));
-    Information($"Published {dllName} to {zipLoc}");
 });
 
 RunTarget(target);

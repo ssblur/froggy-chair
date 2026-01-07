@@ -20,7 +20,7 @@ namespace FroggySetMod {
 
         public override string Name => "Froggy Set";
         public override string Description => "Not just Froggy Chair but Lily-Pad Table too (:";
-        public override string TestedVersionRange => "[0.44.0,0.44.0]";
+        public override string TestedVersionRange => "[0.44.0,0.49.0]";
 
         public override TextureRegion Icon => UI[0, 0];
 
